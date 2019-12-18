@@ -102,15 +102,16 @@ namespace MobileStore.Controllers
 
         
 
-        [HttpPut("{id}")]
-         public IActionResult  PutMobileDetail(int id,List<MobileItems> mobile)
+        //[HttpPut("{id}")]
+        [HttpPut]
+        public IActionResult  PutMobileDetail([FromBody] List<MobileItems> mobile)
          {
              try
              {
                 
                 for (var i=0;i<mobile.ToArray().Length;i++)
                 {
-                    if (id != mobile[i].MobileItemsId)
+                    if (!MobileItemsExists(mobile[i].MobileItemsId))
                     {
                         _context.MobileItems.Add(mobile[i]);
                     }
@@ -119,16 +120,9 @@ namespace MobileStore.Controllers
                 }
                   _context.SaveChanges();
              }
-             catch (DbUpdateConcurrencyException)
+             catch (DbUpdateConcurrencyException jj)
              {
-                 if (!MobileItemsExists(id))
-                 {
-                     return NotFound();
-                 }
-                 else
-                 {
-                     throw;
-                 }
+                return BadRequest(jj);
              }
 
              return NoContent();
