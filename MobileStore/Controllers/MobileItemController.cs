@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MobileStore.Models;
 
+
 namespace MobileStore.Controllers
 {
     [Route("api/[controller]")]
@@ -18,7 +19,11 @@ namespace MobileStore.Controllers
             _context = context;
         }
 
-
+        [HttpGet]
+        public List<MobileItems> GetMobileList()
+        {
+            return _context.MobileItems.Include(a => a.AccessoryItems).ToList();
+        }
 
         [HttpGet("search")]
 
@@ -31,11 +36,7 @@ namespace MobileStore.Controllers
             return Ok(mobileitems);
         }
 
-       [HttpGet]
-        public List<MobileItems> GetMobileList()
-        {
-            return _context.MobileItems.Include(a=>a.AccessoryItems).ToList();
-        }
+       
 
         [HttpGet("{id}")]
 
@@ -49,6 +50,31 @@ namespace MobileStore.Controllers
             }
 
             return Ok(mobileitems);
+
+        }
+
+        [HttpGet("sort")]
+        public IQueryable GetSort([FromQuery] string sortletter,string sortorder)
+        {
+            
+            var mobiles = from m in _context.MobileItems select m;
+            
+           
+                switch (sortorder)
+                {
+                    case "name_desc":
+                        mobiles = mobiles.OrderByDescending(m => m.MobileName);
+                        break;
+                    case "price_desc":
+                        mobiles = mobiles.OrderByDescending(z => z.MobilePrice);
+                        break;
+                }
+            
+            
+            
+               // var mobile = _context.MobileItems.Where(m => m.MobileName.StartsWith(sortletter)).OrderByDescending(x => x.MobileName);
+            
+            return mobiles;
 
         }
 
