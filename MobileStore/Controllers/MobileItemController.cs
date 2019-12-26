@@ -20,8 +20,18 @@ namespace MobileStore.Controllers
 
 
 
-        [HttpGet]
+        [HttpGet("search")]
 
+        public IActionResult GetSearch([FromQuery] string searchstring)
+        {
+            var mobiles = from m in _context.MobileItems select m;
+
+            var mobileitems = _context.MobileItems.Include(a => a.AccessoryItems).Where(m => m.MobileName.Contains(searchstring)).ToList();
+
+            return Ok(mobileitems);
+        }
+
+       [HttpGet]
         public List<MobileItems> GetMobileList()
         {
             return _context.MobileItems.Include(a=>a.AccessoryItems).ToList();
